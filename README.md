@@ -16,24 +16,24 @@ The purpose of the adaptive filter is to minimize the cost function J which is t
 
 The adaptive system gives out an output y which goes into the cost function block, J, along with the desired response. However, y is essentially the mapper chosen by the user for the learning algorithm. For the purpose of this experiment, the output of the mapper will be linear, yielding equation (1) for the output of y. 
 
-![Linear Equation](https://user-images.githubusercontent.com/50300494/58265550-e5a10680-7d4d-11e9-8fb9-40ba201b771b.png)
+![Linear Equation](https://user-images.githubusercontent.com/50300494/58276473-8949e100-7d65-11e9-8333-caacad62b1c0.PNG)
 
 "e" is then calculated by subtracting the output of y with the desired data, d. Hence, yielding equation (2) for the output of the error function. 
 
-![ErrorCalculation](https://user-images.githubusercontent.com/50300494/58265627-0a957980-7d4e-11e9-9672-e67a8c6f20bc.PNG)
+![ErrorCalcualtion](https://user-images.githubusercontent.com/50300494/58276424-6b7c7c00-7d65-11e9-893f-d77c2fe4e4c4.PNG)
 
 The cost function, J, that is represented in equation (3) becomes the squared function of equation (2):
 
-![CostFunction](https://user-images.githubusercontent.com/50300494/58265682-2862de80-7d4e-11e9-9982-4b66f09f10bc.PNG)
+![CostFunction](https://user-images.githubusercontent.com/50300494/58276390-53a4f800-7d65-11e9-85f6-05150ad4e82e.PNG)
 
 The goal of the Wiener Hopf solution is to find the minimum of the cost function by first calculating the derivative of J(w) with respect to w, and then determining the value of w from equation (4). 
 
-![WeinerHopf](https://user-images.githubusercontent.com/50300494/58265719-3f093580-7d4e-11e9-93ee-856a7292c0af.PNG)
+![WeinerHopf](https://user-images.githubusercontent.com/50300494/58276341-35d79300-7d65-11e9-8ef9-6992687e79d9.PNG)
 
 However, this solution is only ideal for stationary signals where the statistics of the input signals do not change over time. Hence, the LMS filter is proposed over the Wiener solutions since the weight values (w) are learnt locally and updated based on each individual sample. 
 
 
-## Least Mean Squared Finite Impulse Response Filter
+## LMS Finite Impulse Response Filter
 
 The alternative method for supervised learning is to use a search algorithm. In essence, this is a special class of algorithms under the category of online learning where the value of w is continuously updated as opposed to the batch learning algorithm proposed by Wiener Hopf. One of the earliest search algorithms that uses the information of the gradient to determine the value of w is called the Steepest Descent. In the Steepest Descent algorithm, instead of finding the value of w from the full range of data, the value of w is updated based on every point of the data. The concept of steepest descent is illustrated in Figure 2. The graph is plotted based on the values of the cost function and the goal of the algorithm is to reach the minimum value of the parabola. Initially, a random value of w, or a value of 0 is chosen as the initial condition. From the starting value,  the value of w moves in the opposite direction to that of the gradient. The algorithm  reaches the minimum of the parabola depending on the value of the step-size This is shown in Equation (5).
 
@@ -47,5 +47,41 @@ An adaptation of equation (5) was proposed by Widrow where the instantaneous val
 
 ![Adaptation](https://user-images.githubusercontent.com/50300494/58276248-eee99d80-7d64-11e9-9a0f-c753cab4420f.PNG)
 
+This would then change equation 5 and allow the computation to become significantly less complex as shown in equation (8). 
+
+![Updatedeq](https://user-images.githubusercontent.com/50300494/58276527-b0081780-7d65-11e9-96d9-cc31249c7b49.PNG)
+
+Equation (8) shows the new LMS algorithm for determining the value of w at multiple intervals. A normalized solution to the LMS algorithm was proposed as shown in equation (9) (NLMS) in order to obtain a greater stability with unknown signals and also to ensure that the outliers of the sample data does not deviate the weight update too far from the trajectory. The only disadvantage of the NLMS would be that it requires more computations (3M+1) multiplications when compared to the LMS algorithm due to the reference signal power.
+
+![NLMS](https://user-images.githubusercontent.com/50300494/58276627-e9d91e00-7d65-11e9-90be-27b9d632c7f8.PNG)
+
+Once the appropriate weights are obtained, the error of the signal is compared qualitatively by listening to the speech after the filtering, and quantitatively by computing the echo return loss enhancement (ERLE) measure shown in equation (10). 
+
+![ERLE](https://user-images.githubusercontent.com/50300494/58276658-01b0a200-7d66-11e9-9c90-01125af2d490.PNG)
+
+ERLE is a measure of the performance of the echo cancellation algorithm. A higher value of ERLE would be tantamount to a greater performance of the system. Hence, the objective is to obtain the best value of ERLE by altering the hyper-parameters namely the step-size and the model order. 
 
 
+## Gamme IIR Filter
+
+Infinite impulse response (IIR) filters are those in which the zeros and poles of the filter can be adapted. They are generally preferred over FIR filters due to the fact that the echo can be synthesized by a relatively smaller number of filter coefficients. The Gamma filter is a special case of a class of linear systems called the feedforward filters. It possesses a general feedforward structure but with the addition of local recursive loops. The Gamma filter is essentially a first order recurrent system. The main working of the Gamma filter is demonstrated in the figure below. 
+
+![gammafilteroutput](https://user-images.githubusercontent.com/50300494/58276748-3e7c9900-7d66-11e9-8985-c7d3c0963e39.PNG)
+
+In an FIR configuration, the signal goes from the input to the output. However, in the case of the Gamma filter, the signal still goes from the input to the output, however there is a return path – making it an IIR filter. The main output of the IIR filter is shown in equation (11).
+
+![IIRoutput](https://user-images.githubusercontent.com/50300494/58276898-90252380-7d66-11e9-802e-ef94203f69a6.PNG)
+
+The output y(n) is the combination of the input x(n), but also with the addition of the previous value of the output. The solution of this equation can be computed given that the initial condition is equal to 0. Hence, when n is a value of 1, y(0)=0. The impulse response of the equation can be computed by solving transfer function in the z domain yielding the output shown in equation (12). 
+
+![Transferfunction](https://user-images.githubusercontent.com/50300494/58276944-a6cb7a80-7d66-11e9-9349-caaf2fd47900.PNG)
+
+From  equation(12) , it is obvious that if the value of   is increased, then the impulse response of the system will decay at a  faster rate. The benefit of the IIR filter is that it can remember every single delay of the input, as opposed to the FIR filter which can only determine a set amount of time delays. The equation in the time domain of y(n) is given in equation (13):
+
+![TimeDomainoutput](https://user-images.githubusercontent.com/50300494/58277021-cd89b100-7d66-11e9-93eb-03f32c91c636.PNG)
+
+Where the values of x(k) are shown in equation (14):
+
+![xk values](https://user-images.githubusercontent.com/50300494/58277067-e5f9cb80-7d66-11e9-8f8b-fa3e45482e12.PNG)
+
+In equation (14) , n denotes the time and k denotes the time of the state variable. For the Gamma filter, to ensure stability, the value of   remains between 0 and 1, and the weights are updated, as before in the FIR filter. 
